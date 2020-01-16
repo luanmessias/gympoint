@@ -206,7 +206,6 @@ class RegistrationController {
     });
 
     // Update data
-
     await reg.update({
       id: reg.id,
       student_id: reg.student_id,
@@ -225,6 +224,22 @@ class RegistrationController {
       end_date: endDate,
       price: totalPrice,
     });
+  }
+
+  async delete(req, res) {
+    const registration = await Registration.findByPk(req.params.id);
+
+    if (!registration) {
+      return res.status(400).json({ error: 'Registration not found' });
+    }
+
+    Registration.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    return res.status(200).json({ success: 'Registration removed' });
   }
 }
 

@@ -25,6 +25,7 @@ routes.delete('/plans/:id', PlanController.delete);
 routes.get('/registrations', RegistrationController.index);
 routes.post('/registrations', RegistrationController.store);
 routes.put('/registrations', RegistrationController.update);
+routes.delete('/registrations/:id', RegistrationController.delete);
 
 routes.put('/users', UserController.update);
 
