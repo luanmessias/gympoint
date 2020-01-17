@@ -1,23 +1,28 @@
 import * as Yup from 'yup';
 import { startOfHour, parseISO, isBefore, addMonths, format } from 'date-fns';
 import pt from 'date-fns/locale/pt';
-import Plan from '../models/Plan';
 import Student from '../models/Student';
+import Plan from '../models/Plan';
+
 import Registration from '../models/Registration';
 import Mail from '../../lib/Mail';
 
 class RegistrationController {
   async index(req, res) {
     const registrations = await Registration.findAll({
-      attributes: [
-        'id',
-        'student_id',
-        'plan_id',
-        'start_date',
-        'end_date',
-        'price',
-        'created_at',
-        'updated_at',
+      attributes: ['id', 'start_date', 'end_date', 'price'],
+      order: [['created_at', 'DESC']],
+      include: [
+        {
+          model: Plan,
+          as: 'plan',
+          attributes: ['id', 'title', 'duration', 'price'],
+        },
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['id', 'name', 'email', 'age', 'weight', 'height'],
+        },
       ],
     });
     return res.json(registrations);

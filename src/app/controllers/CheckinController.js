@@ -1,17 +1,9 @@
-import * as Yup from 'yup';
-import {
-  startOfHour,
-  parseISO,
-  isBefore,
-  addMonths,
-  format,
-  subDays,
-  startOfToday,
-  endOfToday,
-} from 'date-fns';
-import pt from 'date-fns/locale/pt';
+import { subDays, startOfToday, endOfToday } from 'date-fns';
+import Sequelize from 'sequelize';
 import Checkin from '../models/Checkin';
 import Student from '../models/Student';
+
+const { Op } = Sequelize;
 
 class CheckinController {
   async store(req, res) {
@@ -29,12 +21,10 @@ class CheckinController {
       where: {
         student_id,
         created_at: {
-          $between: [startOfToday(new Date()), endOfToday(new Date())],
+          [Op.between]: [startOfToday(new Date()), endOfToday(new Date())],
         },
       },
     });
-
-    console.log(checkin);
 
     if (checkin) {
       return res
@@ -43,15 +33,22 @@ class CheckinController {
     }
 
     // Check if student have reached 5 checkins in 7 days
-    const startDate = await subDays(new Date(), 7);
-    const endDate = await new Date();
     const countCheckins = await Checkin.findAndCountAll({
       where: {
-        from: {
-          $between: [startDate, endDate],
+        created_at: {
+          [Op.between]: [subDays(new Date(), 7), new Date()],
         },
       },
     });
+
+    if (countCheckins.count >= 5) {
+      return res.status(400).json({
+        error: "You've reached the maximum of 5 check-ins in 7 days.",
+      });
+    }
+
+    // Store data
+    await Checkin.create({ student_id });
 
     return res.json('Fim');
   }

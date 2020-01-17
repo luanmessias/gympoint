@@ -12,6 +12,8 @@ class Checkin extends Model {
         sequelize,
       }
     );
+
+    return this;
   }
 }
 

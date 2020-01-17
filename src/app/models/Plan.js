@@ -14,13 +14,8 @@ class Plan extends Model {
         sequelize,
       }
     );
-  }
 
-  static associate(models) {
-    this.belongsTo(models.Registration, {
-      foreignKey: 'plan_id',
-      as: 'plan',
-    });
+    return this;
   }
 }
 
