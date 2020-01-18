@@ -7,6 +7,7 @@ import SessionController from './app/controllers/SessionController';
 import PlanController from './app/controllers/PlanController';
 import RegistrationController from './app/controllers/RegistrationController';
 import CheckinController from './app/controllers/CheckinController';
+import HelpOrderController from './app/controllers/HelpOrderController';
 
 const routes = new Router();
 
@@ -15,6 +16,8 @@ routes.post('/sessions', SessionController.store);
 
 routes.get('/students/:id/checkin', CheckinController.index);
 routes.post('/students/:id/checkin', CheckinController.store);
+
+routes.post('/students/:id/help-orders', HelpOrderController.store);
 
 routes.use(authMiddleware);
 
@@ -32,5 +35,9 @@ routes.put('/registrations', RegistrationController.update);
 routes.delete('/registrations/:id', RegistrationController.delete);
 
 routes.put('/users', UserController.update);
+
+routes.get('/help-orders', HelpOrderController.orders);
+routes.get('/help-orders/:id', HelpOrderController.studentOrders);
+routes.put('/help-orders/:id/answer', HelpOrderController.update);
 
 export default routes;
