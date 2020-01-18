@@ -6,6 +6,32 @@ import Student from '../models/Student';
 const { Op } = Sequelize;
 
 class CheckinController {
+  async index(req, res) {
+    const student_id = req.params.id;
+    const checkins = await Checkin.findAndCountAll({
+      where: {
+        student_id,
+      },
+      attributes: ['id', 'created_at'],
+      order: [['created_at', 'DESC']],
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['id', 'name', 'email', 'age', 'weight', 'height'],
+        },
+      ],
+    });
+
+    if (checkins.count === 0) {
+      return res.status(404).json({
+        error: 'Check-in(s) not found.',
+      });
+    }
+
+    return res.json(checkins);
+  }
+
   async store(req, res) {
     // Check if student exists
     const student = await Student.findByPk(req.params.id);
@@ -35,6 +61,7 @@ class CheckinController {
     // Check if student have reached 5 checkins in 7 days
     const countCheckins = await Checkin.findAndCountAll({
       where: {
+        student_id,
         created_at: {
           [Op.between]: [subDays(new Date(), 7), new Date()],
         },
@@ -50,7 +77,9 @@ class CheckinController {
     // Store data
     await Checkin.create({ student_id });
 
-    return res.json('Fim');
+    return res.status(200).json({
+      success: 'Checkin realizado com sucesso.',
+    });
   }
 }
 
